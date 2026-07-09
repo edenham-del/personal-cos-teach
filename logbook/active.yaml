@@ -1,0 +1,44 @@
+# Chief of Staff Logbook: Active Items
+#
+# Tracks what you've delegated, what you've committed to, decisions made,
+# and open follow-ups. The cos.md command and cos-delegate/cos-followup
+# commands read and write this file.
+#
+# This starter file is empty — entries get added as you use the project.
+# Below is a commented-out example of what an entry looks like.
+
+delegated: []
+  # - id: DEL-001
+  #   what: "[what you asked someone to do]"
+  #   to: "[who]"
+  #   assigned: "[YYYY-MM-DD]"
+  #   due: "[YYYY-MM-DD]"
+  #   status: open   # open, in_progress, or done
+  #   source: "[email/slack/meeting — where this came from]"
+
+committed:
+  []
+  # - id: COM-001
+  #   what: "[what you promised]"
+  #   to: "[who you promised it to]"
+  #   created: "[YYYY-MM-DD]"
+  #   due: "[YYYY-MM-DD]"
+  #   status: open
+  #   context: "[1-2 lines of background]"
+  #   source: "[email/slack/meeting]"
+
+decisions: []
+  # - id: DEC-001
+  #   what: "[what was decided]"
+  #   date: "[YYYY-MM-DD]"
+  #   who: ["[Person A]", "[Person B]"]
+  #   context: "[why this decision was made]"
+  #   source: "[slack/email/meeting]"
+
+followups: []
+  # - id: FUP-001
+  #   what: "[what needs a follow-up]"
+  #   owner: "[you, or whoever owns it]"
+  #   created: "[YYYY-MM-DD]"
+  #   status: open
+  #   source: "[where this came from]"

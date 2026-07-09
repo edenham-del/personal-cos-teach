@@ -1,0 +1,19 @@
+---
+description: "Find mutual availability with people"
+---
+
+Read config.yaml from the project root.
+
+The user wants to schedule time with someone. $ARGUMENTS should include
+who and optionally duration/timeframe.
+
+Steps:
+1. Parse attendees from arguments. Resolve names to emails using config.yaml
+   or a user lookup.
+2. Find mutual availability for the given attendees, duration (default
+   30min), and timeframe (default next 5 business days).
+3. Present top 3-5 options.
+4. If the user picks one, create the event following voice.md calendar
+   style (clear title, 2-4 bullet agenda, prefer 25/50 min).
+
+$ARGUMENTS

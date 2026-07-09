@@ -1,89 +1,103 @@
-# Build Your Own Personal Chief of Staff
+# Personal Chief of Staff — Claude Code Project
 
-A teaching kit for setting up a personal AI Chief of Staff using
-**claude.ai Projects** — no coding required. Built for a company AI Week
-session; shared publicly so anyone can run the same session or just build
-their own.
+A real, working Chief of Staff setup for Claude Code — not a mockup. This
+is a genericized copy of a project actually in daily use: a `CLAUDE.md`
+that defines the assistant's role, a `config.yaml` for your priorities and
+thresholds, a `voice.md` for how drafts should sound, a `logbook/` for
+tracking delegated tasks and commitments, plus slash commands and
+scheduled triggers that do the real work — email triage, calendar prep,
+delegation, follow-ups.
 
-This repo contains no proprietary or company-specific information. Every
-example uses a fictional persona ("Jordan Lee, VP of Operations at Acme
-Corp"). Fork it, use it internally, adapt it for your own team.
+No proprietary or company-specific information is in this repo. Every
+config value, name, and ID is a `[BRACKET PLACEHOLDER]` for you to fill
+in with your own.
 
-## What you'll build
+## How this works
 
-A claude.ai Project that knows:
-1. **Who you are** — your role and the handful of people whose messages
-   matter most
-2. **How you write** — so anything it drafts sounds like you
-3. **Your real email and calendar** — via Connectors, so it can act on
-   real context instead of things you paste in
-4. **What it's learned from you** — via Memory, so corrections and
-   commitments stick without you rebuilding your setup every time
+Claude Code automatically reads `CLAUDE.md` at the start of every session
+in this directory, and the `.claude/commands/*.md` files become slash
+commands (`/cos`, `/cos-brief`, etc.) available whenever you're working in
+this project. `config.yaml`, `voice.md`, and `logbook/` are just files
+that those commands and triggers read and write — there's no special
+mechanism, it's all plain text your AI assistant is instructed to consult.
 
-By the end, you can ask it things like "give me a morning briefing," "draft
-a reply to this," or "remember that I promised this by Friday" — and get a
-real, personalized answer back.
+If you'd rather use claude.ai Projects instead of Claude Code, the pattern
+still works: paste `CLAUDE.md`'s content into the Project's Custom
+Instructions field, attach `config.yaml`/`voice.md` as knowledge files or
+merge them in, and use `logbook/` as a note you keep in the Project (or
+let Memory hold delegated items and commitments instead — see the note in
+`logbook/active.yaml`).
 
-## Two ways to use this repo
+## Setup
 
-### Option A — Just want to build your own, right now
+1. Clone or copy this repo into its own directory.
+2. Fill in `config.yaml` — your name, role, priority people, channels,
+   thresholds. Every `[BRACKET]` needs a real value.
+3. Fill in `voice.md` — your actual writing style. Replace the example
+   with something you've really written.
+4. Fill in the `[BRACKET]` placeholders in `CLAUDE.md` and
+   `.claude/commands/cos.md` (org context — your manager, peers, reports).
+5. Connect whichever tools you actually use (Gmail, Google Calendar,
+   Slack, an expense tool, an issue tracker) via MCP or your platform's
+   connector system. You don't need all of them — start with Gmail and
+   Calendar.
+6. Open Claude Code in this directory and run `/cos` or `/cos scan` to
+   test it.
 
-1. Go to [claude.ai](https://claude.ai) and create a new **Project**
-   (requires a paid plan — Pro, Team, or Enterprise).
-2. Turn on the **Gmail** and **Google Calendar** Connectors for that
-   Project (Settings → Connectors, or inside the Project itself, depending
-   on your workspace).
-3. Open [`03-EXERCISES.md`](03-EXERCISES.md) and follow it top to bottom.
-   It'll point you at the templates in [`templates/`](templates/) as you
-   go, and at [`04-DISCOVERY-PROMPTS.md`](04-DISCOVERY-PROMPTS.md) if you'd
-   rather be interviewed by Claude than fill in blanks yourself.
-4. Optional: skim [`01-WHAT-IS-A-PERSONAL-COS.md`](01-WHAT-IS-A-PERSONAL-COS.md)
-   first if you want the concept explained before diving in.
+## What's in here
 
-Point your browser at this repo, keep it open in a second tab, and work
-through the files in order. That's the whole "setup."
+```
+CLAUDE.md                          Main project instructions — read automatically every session
+config.yaml                        Your priorities, people, channels, thresholds
+voice.md                           Your writing voice — used for every draft
+logbook/
+  active.yaml                      Open delegated tasks, commitments, decisions, follow-ups
+  archive.yaml                     Completed/closed items, moved here from active.yaml
+.claude/commands/
+  cos.md                           Master command — the entry point for any task, or "scan"
+  cos-brief.md                     Decision brief from email + Slack + calendar
+  cos-delegate.md                  Delegate a task: Slack message + calendar invite
+  cos-email-draft.md               Draft an email reply or new email in your voice
+  cos-find-time.md                 Find mutual availability with people
+  cos-focus.md                     Find and book focus time blocks
+  cos-followup.md                  Follow up on a commitment (yours or someone else's)
+  cos-thread.md                    Summarize a Slack thread
+  cos-spend.md                     Spending/approvals overview (optional, needs a finance tool)
+triggers/
+  cos-morning.md                   Morning briefing: calendar, email triage, Slack, approvals
+  cos-eod.md                       End of day recap
+  cos-urgent.md                    Evening sweep for anything urgent that fell through the cracks
+  cos-week.md                      Sunday-evening preview of the week ahead
+  cos-composer.md                  Hourly: meeting prep, email drafts, Slack pulse
+```
 
-### Option B — Running this as a live workshop for a group
+## The `.claude/commands/` files vs. `triggers/`
 
-Use [`00-FACILITATOR-GUIDE.md`](00-FACILITATOR-GUIDE.md) — a full run of
-show for a 60-minute hands-on session, with timing, talk track, and
-anticipated questions. Send [`02-SETUP-CHECKLIST.md`](02-SETUP-CHECKLIST.md)
-to attendees a few days ahead so account/connector setup doesn't eat into
-your session time.
+Both are markdown files with instructions — the difference is how they
+run:
 
-A ready-to-present slide deck covering the same material is in
-[`slides/`](slides/) — see [`slides/README.md`](slides/README.md) for how
-to open/present it.
-
-## File guide
-
-See [`FILE-GUIDE.md`](FILE-GUIDE.md) for the full file tree, what each file
-does, and the build order end-to-end. Short version:
-
-| File | What it's for |
-|---|---|
-| [`01-WHAT-IS-A-PERSONAL-COS.md`](01-WHAT-IS-A-PERSONAL-COS.md) | The concept, in plain language — start here if you're new to this |
-| [`02-SETUP-CHECKLIST.md`](02-SETUP-CHECKLIST.md) | Account and Connector setup, do this first |
-| [`03-EXERCISES.md`](03-EXERCISES.md) | Step-by-step build — the main event |
-| [`04-DISCOVERY-PROMPTS.md`](04-DISCOVERY-PROMPTS.md) | Prompts that let Claude interview you and write your voice/identity files for you, instead of filling in blanks |
-| [`templates/`](templates/) | Fill-in-the-blank files for custom instructions, voice, and preferences |
-| [`examples/`](examples/) | A fully filled-out fictional example (Jordan Lee, Acme Corp) so you can see a finished setup |
-| [`00-FACILITATOR-GUIDE.md`](00-FACILITATOR-GUIDE.md) | Run-of-show for presenting this as a live session |
-| [`slides/`](slides/) | Slide deck covering the same material |
+- **`.claude/commands/`** are slash commands. You type `/cos-brief topic`
+  and Claude Code runs it on demand.
+- **`triggers/`** are meant to run on a schedule (see the `schedule:`
+  section in `config.yaml`) — a morning briefing at 7am, an hourly sweep,
+  a Sunday evening preview. Claude Code itself doesn't have a built-in
+  scheduler, so wiring these to actually fire on a schedule requires your
+  own automation (a cron job that invokes Claude Code with the trigger
+  file as the prompt, a scheduled cloud agent, etc.). Until you wire that
+  up, you can still run any trigger file manually by asking Claude to
+  follow it.
 
 ## What this is not
 
-- Not autonomous — every pattern in this kit drafts, never sends, without
+- Not autonomous — every command and trigger drafts, never sends, without
   your review.
-- Not a data pipeline into any shared system — a Project only sees what
-  YOUR connected accounts can see, and Memory is scoped to your own
-  account.
-- Not specific to any one company's tools or org chart — everything here
-  is intentionally generic so you can adapt it to your own role.
+- Not tied to any specific company's tools — swap Gmail/Calendar/Slack for
+  whatever you actually use; the pattern (config + voice + logbook + a
+  master command) is what matters, not the specific integrations.
+- Not magic — if you don't fill in `config.yaml` and `voice.md` with real
+  values, it has nothing to prioritize by and no voice to match.
 
 ## License
 
 MIT — see [`LICENSE`](LICENSE). Free to use, fork, and adapt for your own
-team or company.
-
-Built by [Siddharth Dixit](https://github.com/siddsdixit).
+setup.

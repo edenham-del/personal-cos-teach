@@ -1,0 +1,128 @@
+# Chief of Staff - Configuration
+# Edit these values to match your setup, then commit + push.
+# Everything in brackets is a placeholder. Delete the brackets once filled in.
+
+user:
+  name: "[YOUR NAME]"
+  role: "[YOUR ROLE / TITLE]"
+  company: "[YOUR COMPANY]"
+  timezone: "[YOUR TIMEZONE, e.g. America/Los_Angeles]"
+  slack_user_id: "[YOUR SLACK USER ID, e.g. U0XXXXXXX]"
+  email: "[YOUR EMAIL]"
+
+# Priority senders - emails from these addresses get drafted replies
+email:
+  priority_senders:
+    # Manager / board / executive tone
+    - "[MANAGER EMAIL]"                # [Manager name/title]
+    - "[BOARD MEMBER EMAIL]"           # [Board member / investor]
+    # Peers (team tone)
+    - "[PEER 1 EMAIL]"                 # [Peer role, e.g. Head of Product]
+    - "[PEER 2 EMAIL]"                 # [Peer role, e.g. CFO]
+    # Direct reports (team tone)
+    - "[REPORT 1 EMAIL]"
+    - "[REPORT 2 EMAIL]"
+    # Cross-functional
+    - "[CROSS-FUNCTIONAL CONTACT EMAIL]"
+    # Assistant / EA
+    - "[EA EMAIL]"
+
+  # Tone mapping: board/exec domains get executive mode
+  executive_domains:
+    - "[BOARD OR PARENT COMPANY DOMAIN, e.g. yourboardfirm.com]"
+  executive_senders:
+    - "[YOUR MANAGER'S EMAIL]"
+  labels_to_watch:
+    - "INBOX"
+    - "IMPORTANT"
+
+  # Optional: if you use an AI email triage tool that applies its own
+  # labels, map them here so this project doesn't duplicate work it's
+  # already done.
+  # ai_triage_labels:
+  #   respond: "Label_ID_HERE"       # -> NEEDS-RESPONSE
+  #   waiting: "Label_ID_HERE"       # -> FYI (waiting on others)
+  #   meeting: "Label_ID_HERE"       # -> FYI
+  #   news: "Label_ID_HERE"          # -> skip
+  #   social: "Label_ID_HERE"        # -> skip
+  #   marketing: "Label_ID_HERE"     # -> skip
+
+# Calendar preferences
+calendar:
+  focus_time:
+    min_block_hours: 2
+    preferred_times: ["morning"]   # morning, afternoon, or any
+    preferred_days: ["tuesday", "wednesday", "thursday"]
+  prep_minutes_before: 15
+  calendars: ["primary"]
+  meeting_duration_preference: 25  # prefer 25 or 50 min over 30/60
+
+# Slack monitoring
+slack:
+  priority_channels:
+    - id: "[CHANNEL ID, e.g. C0XXXXXXX]"
+      name: "[channel-name, e.g. leadership-team]"
+    - id: "[CHANNEL ID]"
+      name: "[channel-name]"
+    - id: "[CHANNEL ID]"
+      name: "[channel-name]"
+  watch_keywords:
+    - "outage"
+    - "blocker"
+    - "urgent"
+    - "escalation"
+  output_channel: "[YOUR SLACK USER ID — send DMs to yourself]"
+
+# Finance / expense approvals (skip this section if not relevant to your role)
+finance:
+  auto_approve_below: 500
+  alert_threshold: 5000
+  flag_categories:
+    - "travel"
+    - "software"
+
+# Issue tracker (skip this section if not relevant to your role)
+issue_tracker:
+  project_keys:
+    - ""                     # e.g., "ENG", "OPS"
+  sprint_board: ""           # Board name or ID for sprint tracking
+  triage_project: ""         # Project key for incoming bugs/incidents
+
+# Gmail labels (create these manually in Gmail first, then add IDs)
+# Optional — only needed if you want this project to apply its own labels
+# rather than just categorizing in its text output.
+gmail_labels:
+  urgent: "[LABEL ID]"
+  needs_response: "[LABEL ID]"
+  fyi: "[LABEL ID]"
+  delegate: "[LABEL ID]"
+
+# Reminders
+reminders:
+  pre_meeting:
+    enabled: true
+    minutes_before: 45       # Slack DM this many minutes before meeting
+    output: "slack_dm"       # Send to Slack DM
+  unanswered_email:
+    enabled: true
+    times: ["13:00", "16:00"]  # adjust to your own schedule
+  eod_deadline:
+    enabled: true
+    time: "16:30"              # adjust to your own schedule
+  approval_reminder:
+    enabled: true              # Included with approvals check
+
+# Logbook (see logbook/ folder — tracks delegated tasks, commitments,
+# decisions, and follow-ups). Optional: sync a copy to a Slack canvas.
+logbook:
+  slack_canvas_id: "[CANVAS ID, optional]"
+  slack_canvas_url: "[CANVAS URL, optional]"
+
+# Schedule (adjust times to your own timezone/day)
+schedule:
+  morning_briefing: "07:00"
+  eod_summary: "17:30"
+  urgent_check: "21:00"
+  approvals_check: ["10:00", "15:00"]
+  slack_pulse_hours: 2
+  weekly_preview: "sunday 19:00"

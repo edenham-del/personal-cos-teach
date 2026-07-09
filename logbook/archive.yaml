@@ -1,0 +1,15 @@
+# Chief of Staff Logbook: Archived Items
+# Completed and closed items moved here from active.yaml.
+# Kept for weekly summaries and historical reference.
+#
+# This starter file is empty. When you mark an item done in active.yaml,
+# move it here and add a "completed" date and "resolution" line.
+
+completed: []
+  # - id: DEL-001
+  #   what: "[what it was]"
+  #   to: "[who]"
+  #   assigned: "[YYYY-MM-DD]"
+  #   completed: "[YYYY-MM-DD]"
+  #   type: delegated   # delegated, committed, decision, or followup
+  #   resolution: "[how it was resolved, or why it was closed]"
