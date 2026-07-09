@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Own Personal Chief of Staff — AI Week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1b2d;
+    --navy-light: #1c2e47;
+    --navy-lighter: #28405f;
+    --amber: #e88d2d;
+    --amber-dark: #c9741c;
+    --teal: #4ea8b0;
+    --teal-dark: #367880;
+    --good: #3ea06b;
+    --warn: #c94f3b;
+    --ink: #15181f;
+    --body-text: #4a5461;
+    --muted: #6b7482;
+    --border: #e2e8f0;
+    --card-bg: #f5f7fa;
+    --offwhite: #f4f6f8;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: #e6e9ed;
+    overflow: hidden;
+  }
+
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---- Progress bar ---- */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--amber), var(--teal));
+    z-index: 1000;
+    transition: width 0.4s ease;
+  }
+
+  /* ---- Deck wrapper ---- */
+  #deck {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    width: min(1160px, 96vw);
+    height: min(680px, 94vh);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(15,27,45,0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(60px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: all;
+  }
+
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.98);
+  }
+
+  .slide.exit-right {
+    opacity: 0;
+    transform: translateX(60px) scale(0.98);
+  }
+
+  /* ---- Dark full-bleed variant (section breaks / title) ---- */
+  .slide.dark {
+    background: var(--navy);
+  }
+  .slide.amber {
+    background: var(--amber);
+  }
+  .slide.teal {
+    background: var(--teal);
+  }
+
+  .accent-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--amber);
+  }
+
+  /* ---- Standard content slide header ---- */
+  .slide-header {
+    padding: 40px 56px 0;
+    flex-shrink: 0;
+  }
+
+  .kicker {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--amber-dark);
+    margin-bottom: 10px;
+  }
+  .dark .kicker, .navy-text .kicker { color: var(--amber); }
+
+  .slide-title {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+  .dark .slide-title { color: #fff; }
+
+  .slide-subtitle {
+    font-size: 16px;
+    color: var(--body-text);
+    margin-top: 10px;
+    line-height: 1.5;
+    max-width: 780px;
+  }
+  .dark .slide-subtitle { color: #c9d2de; }
+
+  .slide-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 26px 56px 30px;
+  }
+
+  /* ---- Section / title slide layout ---- */
+  .title-wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 70px;
+    position: relative;
+  }
+  .title-wrap .eyebrow {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 18px;
+  }
+  .title-wrap h1 {
+    font-size: 56px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.08;
+    letter-spacing: -1px;
+    margin-bottom: 26px;
+  }
+  .title-wrap p {
+    font-size: 19px;
+    color: #c9d2de;
+    line-height: 1.5;
+    max-width: 620px;
+  }
+  .title-wrap .repo-tag {
+    margin-top: 34px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .section-wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+  }
+  .section-wrap .part-label {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    opacity: 0.7;
+    margin-bottom: 14px;
+  }
+  .section-wrap h1 {
+    font-size: 50px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+  .section-wrap p {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.85;
+    max-width: 640px;
+  }
+
+  /* ---- Grid helpers ---- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+  }
+  .card.dark-card {
+    background: var(--navy-light);
+    border: none;
+    color: #fff;
+  }
+  .card-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--amber-dark);
+    margin-bottom: 10px;
+  }
+  .dark-card .card-label { color: var(--amber); }
+  .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .dark-card h3 { color: #fff; }
+  .card p, .card li {
+    font-size: 14.5px;
+    color: var(--body-text);
+    line-height: 1.5;
+  }
+  .dark-card p, .dark-card li { color: #d5dbe4; }
+
+  /* ---- Numbered pieces (concept slide) ---- */
+  .piece {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 20px;
+    text-align: left;
+  }
+  .piece .num-circle {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .piece h4 { font-size: 17px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+  .piece p { font-size: 13.5px; color: var(--muted); line-height: 1.45; }
+
+  /* ---- Bulleted list styling ---- */
+  ul.clean { list-style: none; }
+  ul.clean li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 14px;
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  ul.clean li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    background: var(--amber);
+  }
+  .dark ul.clean li { color: #e8ecf1; }
+  ul.clean li strong { color: var(--ink); font-weight: 700; }
+  .dark ul.clean li strong { color: #fff; }
+
+  ul.clean.teal-dots li::before { background: var(--teal); }
+  ul.clean.warn-dots li::before { background: var(--warn); }
+  ul.clean.good-dots li::before { background: var(--good); }
+
+  /* ---- Checklist ---- */
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .checklist .box {
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    border: 2px solid var(--amber);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ---- Steps (numbered) ---- */
+  .steps { list-style: none; counter-reset: stepnum; }
+  .steps li {
+    counter-increment: stepnum;
+    position: relative;
+    padding-left: 42px;
+    margin-bottom: 18px;
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .steps li::before {
+    content: counter(stepnum);
+    position: absolute;
+    left: 0; top: -2px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps li strong { font-weight: 700; }
+
+  /* ---- Prompt / quote block ---- */
+  .prompt-block {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 22px 26px;
+    color: #fff;
+    font-size: 17px;
+    font-style: italic;
+    line-height: 1.5;
+    border-left: 4px solid var(--amber);
+  }
+
+  .terminal {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 22px 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: #e8ecf1;
+    line-height: 1.65;
+    white-space: pre-wrap;
+  }
+  .terminal .tprompt { color: var(--amber); font-weight: 600; }
+
+  /* ---- Table ---- */
+  table.cmp { width: 100%; border-collapse: collapse; }
+  table.cmp th {
+    background: var(--navy);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 16px;
+  }
+  table.cmp th:first-child { border-radius: 8px 0 0 0; }
+  table.cmp th:last-child { border-radius: 0 8px 0 0; }
+  table.cmp td {
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  table.cmp tr:nth-child(even) td { background: #f7f9fb; }
+  table.cmp td:first-child { font-weight: 700; color: var(--muted); width: 18%; }
+
+  /* ---- Pills ---- */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--amber);
+    color: var(--navy);
+  }
+  .pill.teal { background: var(--teal); color: #fff; }
+
+  /* ---- Icon inline ---- */
+  .icon-inline { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+
+  /* ---- Footer ---- */
+  .slide-footer {
+    position: absolute;
+    bottom: 14px;
+    left: 56px;
+    right: 56px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+    pointer-events: none;
+  }
+  .dark .slide-footer, .amber .slide-footer, .teal .slide-footer { color: rgba(255,255,255,0.55); }
+
+  /* ---- Navigation ---- */
+  #nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 500;
+  }
+
+  .nav-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(15,27,45,0.85);
+    color: #fff;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-btn:hover { background: var(--navy-lighter); transform: scale(1.06); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+  #dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    max-width: 420px;
+    overflow-x: auto;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(15,27,45,0.25);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    flex-shrink: 0;
+  }
+  .dot.active {
+    background: var(--amber);
+    transform: scale(1.5);
+  }
+
+  #counter {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 500;
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 26px;
+    left: 26px;
+    font-size: 11.5px;
+    color: var(--muted);
+    z-index: 500;
+  }
+  #hint kbd {
+    background: rgba(15,27,45,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  /* ---- Speaker notes panel ---- */
+  #notes-panel {
+    position: fixed;
+    right: 0; top: 0; bottom: 0;
+    width: 380px;
+    background: #12202f;
+    color: #dbe3ec;
+    padding: 26px 26px 90px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 900;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+  }
+  #notes-panel.open { transform: translateX(0); }
+  #notes-panel h4 {
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+    font-weight: 800;
+  }
+  #notes-panel p { font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: #c9d2de; }
+
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .slide-title { font-size: 26px; }
+    .title-wrap h1 { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width: 4.16%;"></div>
+
+<div id="deck">
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 0 — Title -->
+  <!-- ============================================================ -->
+  <div class="slide dark active" data-slide="0">
+    <div class="accent-bar"></div>
+    <div class="title-wrap">
+      <div class="eyebrow">AI Week · Hands-On Session</div>
+      <h1>Build Your Own<br>Personal Chief of Staff</h1>
+      <p>A working AI assistant that knows your priorities, your voice, and your real calendar and inbox — built in one session, using claude.ai.</p>
+      <div class="repo-tag">github.com/siddsdixit/personal-cos-teach</div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Start</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 1 — Agenda -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="1">
+    <div class="slide-header">
+      <div class="kicker">Today's Session</div>
+      <h1 class="slide-title">60 minutes, fully hands-on</h1>
+    </div>
+    <div class="slide-body">
+      <table class="cmp">
+        <tr><th style="width:16%">Time</th><th style="width:26%">Segment</th><th>Goal</th></tr>
+        <tr><td>0:00–0:10</td><td><strong>Concept</strong></td><td>What a personal Chief of Staff is, and why it's different from a one-off prompt</td></tr>
+        <tr><td>0:10–0:15</td><td><strong>Setup checkpoint</strong></td><td>Confirm everyone has a Project + Connectors live</td></tr>
+        <tr><td>0:15–0:32</td><td><strong>Build: Identity + Voice</strong></td><td>Teach it who you are and how you sound</td></tr>
+        <tr><td>0:32–0:44</td><td><strong>Build: First real task</strong></td><td>A live morning briefing, from your real inbox + calendar</td></tr>
+        <tr><td>0:44–0:52</td><td><strong>Build: Teach it with Memory</strong></td><td>Save a correction or a commitment — watch it stick</td></tr>
+        <tr><td>0:52–0:58</td><td><strong>Showcase + what's next</strong></td><td>Volunteers share, we tease the advanced moves</td></tr>
+        <tr><td>0:58–1:00</td><td><strong>Close</strong></td><td>Where everything lives, how to keep going after today</td></tr>
+      </table>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Agenda</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 2 — The problem -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="2">
+    <div class="slide-header">
+      <div class="kicker">The Problem</div>
+      <h1 class="slide-title">Four tabs and a memory test, every morning</h1>
+    </div>
+    <div class="slide-body grid-2" style="align-items:start;">
+      <ul class="clean" style="margin-top:10px;">
+        <li><i data-lucide="mail" class="icon-inline"></i>Open email — scan for anything urgent</li>
+        <li><i data-lucide="calendar" class="icon-inline"></i>Open calendar — check what meetings need prep</li>
+        <li><i data-lucide="message-square" class="icon-inline"></i>Open Slack — check what you missed overnight</li>
+        <li><i data-lucide="brain" class="icon-inline"></i>Try to remember what you promised, and what someone promised you</li>
+      </ul>
+      <div class="card dark-card">
+        <div class="card-label">Why It's Tiring</div>
+        <h3>None of this is hard.</h3>
+        <p>It's just scattered, repetitive, and it never stops. The triage tax accumulates daily whether or not the work itself is difficult.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Concept</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 3 — The idea (4 pieces) -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="3">
+    <div class="slide-header">
+      <div class="kicker">The Idea</div>
+      <h1 class="slide-title">One Project, four things it knows about you</h1>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4">
+        <div class="piece">
+          <div class="num-circle" style="background:var(--amber);">1</div>
+          <h4>Who you are</h4>
+          <p>Your role, your priority people, what "urgent" actually means for your job</p>
+        </div>
+        <div class="piece">
+          <div class="num-circle" style="background:var(--teal);">2</div>
+          <h4>How you sound</h4>
+          <p>Your writing voice, so anything drafted sounds like you — not a generic assistant</p>
+        </div>
+        <div class="piece">
+          <div class="num-circle" style="background:var(--good);">3</div>
+          <h4>Your real tools</h4>
+          <p>Live, read access to your inbox and calendar via Connectors</p>
+        </div>
+        <div class="piece">
+          <div class="num-circle" style="background:var(--warn);">4</div>
+          <h4>What it's learned</h4>
+          <p>Memory — corrections and commitments that stick without redoing your setup</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Concept</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 4 — Chat vs Project -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="4">
+    <div class="slide-header">
+      <div class="kicker">Why A Project, Not Just A Chat</div>
+      <h1 class="slide-title">Persistence is the whole trick</h1>
+    </div>
+    <div class="slide-body grid-2">
+      <div class="card">
+        <div class="card-label" style="color:var(--warn);">A Regular Chat</div>
+        <ul class="clean warn-dots">
+          <li>Starts from zero every time</li>
+          <li>You re-explain your role and priorities each time</li>
+          <li>No access to your real inbox/calendar unless you paste it in</li>
+          <li>Nothing you correct persists to next time</li>
+        </ul>
+      </div>
+      <div class="card dark-card">
+        <div class="card-label">A Claude Project</div>
+        <ul class="clean">
+          <li>Custom instructions persist across every conversation</li>
+          <li>Connectors give live, read access to real systems</li>
+          <li>Memory keeps what it learns as you use it</li>
+          <li>A two-word prompt like "morning briefing" produces a real answer</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Concept</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 5 — Custom instructions vs memory table -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="5">
+    <div class="slide-header">
+      <div class="kicker">Two Different Tools</div>
+      <h1 class="slide-title">Custom instructions vs. memory</h1>
+    </div>
+    <div class="slide-body">
+      <table class="cmp">
+        <tr><th></th><th>Custom instructions</th><th>Memory</th></tr>
+        <tr><td>What it holds</td><td>Stable facts about you — role, priority people, voice, standing rules</td><td>Things that happened — a correction, a commitment, a one-off preference</td></tr>
+        <tr><td>How it's written</td><td>You write or paste it yourself, deliberately</td><td>It writes itself as you talk to it, or you say "remember this"</td></tr>
+        <tr><td>Good for</td><td>"I am the VP of Ops" / "Always draft, never send"</td><td>"I promised the report by Friday" / "Ignore emails from that newsletter"</td></tr>
+        <tr><td>Changes</td><td>Rarely — revisit occasionally</td><td>Constantly — accumulates as you use it</td></tr>
+      </table>
+      <p style="margin-top:20px; font-size:14.5px; font-style:italic; color:var(--muted);">Rule of thumb: if it's true every day, it goes in custom instructions. If it's true this week, let memory hold it.</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Concept</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 6 — Boundaries -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="6">
+    <div class="slide-header">
+      <div class="kicker">Boundaries</div>
+      <h1 class="slide-title">What this is not</h1>
+    </div>
+    <div class="slide-body" style="padding-top:10px;">
+      <ul class="clean" style="font-size:17px;">
+        <li><strong>Not autonomous.</strong> It never sends an email or message on your behalf without you seeing and approving it first. It drafts. You decide.</li>
+        <li><strong>Not shared.</strong> Your Project only sees what YOUR connected accounts can see. Nobody else's data, nobody else's inbox.</li>
+        <li><strong>Not magic.</strong> If you don't tell it what matters to you, it will guess — and generic guesses are exactly what we're avoiding. The setup work is what makes the difference.</li>
+      </ul>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Concept</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 7 — Section: Setup -->
+  <!-- ============================================================ -->
+  <div class="slide amber" data-slide="7">
+    <div class="section-wrap">
+      <div class="part-label">Part 1</div>
+      <h1>Setup Checkpoint</h1>
+      <p>Confirm your Project exists and Connectors are live</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 1</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 8 — Setup checklist -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="8">
+    <div class="slide-header">
+      <div class="kicker">Before We Build</div>
+      <h1 class="slide-title">Setup checklist</h1>
+    </div>
+    <div class="slide-body">
+      <ul class="checklist">
+        <li><div class="box"></div>Logged into claude.ai with a Projects-enabled account (Pro, Team, or Enterprise)</li>
+        <li><div class="box"></div>Created a new, empty Project — name it "My Chief of Staff" or similar</li>
+        <li><div class="box"></div>Gmail Connector shows "Connected"</li>
+        <li><div class="box"></div>Google Calendar Connector shows "Connected"</li>
+        <li><div class="box"></div>(Optional) Slack Connector shows "Connected"</li>
+        <li><div class="box"></div>Have one real sentence or paragraph you've written on hand</li>
+      </ul>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 1</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 9 — Section: Identity + Voice -->
+  <!-- ============================================================ -->
+  <div class="slide teal" data-slide="9">
+    <div class="section-wrap">
+      <div class="part-label" style="color:var(--navy);">Part 2</div>
+      <h1>Identity + Voice</h1>
+      <p>Teach it who you are and how you sound</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 10 — Exercise 1: Identity -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="10">
+    <div class="slide-header">
+      <div class="kicker">Exercise 1 · 10 min</div>
+      <h1 class="slide-title">Identity and priorities</h1>
+    </div>
+    <div class="slide-body grid-2">
+      <ol class="steps">
+        <li><strong>Name, role, company.</strong> One line each — the easy win, builds momentum.</li>
+        <li><strong>Who matters most.</strong> 3-5 people whose messages you'd drop everything for. Not your whole org chart.</li>
+        <li><strong>Define "urgent" for your job specifically.</strong> Be concrete: "anything from my manager about a live issue," not "time-sensitive things."</li>
+        <li><strong>Paste it all into Custom Instructions and save.</strong> This is the main file — every Project has exactly one Custom Instructions box.</li>
+      </ol>
+      <div class="card dark-card">
+        <div class="card-label">Checkpoint</div>
+        <p style="font-size:16px; margin-bottom:10px;">Open a new chat and ask:</p>
+        <p style="font-style:italic; color:#fff; font-size:16px;">"What do you know about me so far?"</p>
+        <p style="margin-top:10px;">It should reflect your name, role, and priority people back to you.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 11 — Exercise 2: Voice -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="11">
+    <div class="slide-header">
+      <div class="kicker">Exercise 2 · 10 min</div>
+      <h1 class="slide-title">Voice</h1>
+    </div>
+    <div class="slide-body grid-2">
+      <ol class="steps">
+        <li><strong>Pick your spectrum.</strong> Direct vs. warm. Short vs. detailed. Formal vs. casual.</li>
+        <li><strong>Write 3 rules in your own words.</strong> Turn what you picked into checkable instructions.</li>
+        <li><strong>Paste one real example.</strong> A real email or message you've actually written — this teaches tone better than any adjective list.</li>
+        <li><strong>Add it to the same Custom Instructions box.</strong> Or attach it as a separate file — see the next slide for that choice.</li>
+      </ol>
+      <div class="card dark-card">
+        <div class="card-label" style="color:var(--teal);">Checkpoint</div>
+        <p style="font-size:15px;">Ask it to draft a one-line Slack message about a meeting moving to 3pm.</p>
+        <p style="margin-top:10px; font-size:15px;">Does it sound like you? If not, sharpen the rules or add another example.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 12 — Main file vs attachments hierarchy -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="12">
+    <div class="slide-header">
+      <div class="kicker">How The Pieces Fit Together</div>
+      <h1 class="slide-title">One main file. Everything else is optional.</h1>
+    </div>
+    <div class="slide-body">
+      <div class="card dark-card" style="border-left:4px solid var(--amber); margin-bottom:18px;">
+        <div class="card-label">The Main File</div>
+        <h3 style="margin-bottom:6px;"><code>custom-instructions-template.md</code></h3>
+        <p>Pasted directly into the Project's Custom Instructions box. Every Project has exactly one. Think of it the same way you'd think of a CLAUDE.md or agent.md — the one file that defines who the assistant is.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label" style="color:var(--teal-dark);">Add-on — Voice</div>
+          <h3><code>voice-template.md</code></h3>
+          <p>Attach as a separate knowledge file, or merge its content into the main file's "My Voice" section. Recommended, not required.</p>
+        </div>
+        <div class="card">
+          <div class="card-label" style="color:var(--muted);">Add-on — Preferences</div>
+          <h3><code>config-template.md</code></h3>
+          <p>Calendar habits, approvals, commitment tracking. Optional — add later once the basics work.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 13 — Discovery prompt 1, full text -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="13">
+    <div class="slide-header">
+      <div class="kicker">Alternative Path · Prompt 1 of 2</div>
+      <h1 class="slide-title" style="font-size:26px;">Find my voice — copy this into a plain Claude chat</h1>
+      <p class="slide-subtitle" style="margin-top:4px;">First paste in 3-5 real things you've written, then this prompt.</p>
+    </div>
+    <div class="slide-body">
+      <div class="terminal" style="font-size:11.5px; line-height:1.55; max-height:400px; overflow-y:auto;">I want you to figure out my writing voice by analyzing real examples I
+give you, then write it up as a clear style guide I can hand to another
+AI assistant so it writes like me.
+
+Here are several things I've actually written. Read all of them before
+you say anything:
+
+[PASTE EXAMPLE 1]
+[PASTE EXAMPLE 2]
+[PASTE EXAMPLE 3 — add more if you have them]
+
+Now do this:
+1. Tell me what you notice about my voice — sentence length, formality,
+   how I open and close messages, whether I use bullet points, how direct
+   I am, any phrases or habits that repeat.
+2. Ask me up to 3 clarifying questions if something is ambiguous or
+   inconsistent across examples.
+3. Once I've answered, write a finished voice guide in markdown:
+   Persona paragraph, Core Rules (4-6 concrete rules), a real example kept
+   as-is, and a Modes section only if you saw evidence of audience-based
+   tone shifts.
+4. Output the finished guide as a markdown code block titled "voice.md".</div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 14 — Discovery prompt 2, full text -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="14">
+    <div class="slide-header">
+      <div class="kicker">Alternative Path · Prompt 2 of 2</div>
+      <h1 class="slide-title" style="font-size:26px;">Find my priorities — copy this into a plain Claude chat</h1>
+      <p class="slide-subtitle" style="margin-top:4px;">No prep needed — this one works as a pure interview.</p>
+    </div>
+    <div class="slide-body">
+      <div class="terminal" style="font-size:11.5px; line-height:1.55; max-height:400px; overflow-y:auto;">I want to set up a personal AI assistant (a Chief of Staff) and I need to
+define who I am and what matters to me so it can prioritize correctly.
+Interview me with short, one-at-a-time questions — don't ask everything
+at once. Cover:
+
+1. My name, role, and company/team
+2. The 3-5 people whose messages should always get flagged first (ask me
+   who they are and why)
+3. What "urgent" actually means in my specific job — push me for something
+   concrete, not generic ("time-sensitive things")
+4. How I want things categorized when it scans my email or messages
+   (offer URGENT / NEEDS RESPONSE / FYI / CAN WAIT as a default)
+5. Anything it should NEVER do automatically (e.g. never send without my
+   review)
+
+Ask one question at a time and wait for my answer before moving to the
+next. Once you have all 5, write it up as a finished markdown document
+titled "identity.md" with clear headers matching the 5 areas above.</div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 15 — Attaching files -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="15">
+    <div class="slide-header">
+      <div class="kicker">Either Path Ends Here</div>
+      <h1 class="slide-title">Getting content into your Project</h1>
+    </div>
+    <div class="slide-body grid-2">
+      <div class="card">
+        <div class="card-label">Option A</div>
+        <h3>Paste directly</h3>
+        <ul class="clean">
+          <li>Into the Custom Instructions field</li>
+          <li>Best for shorter content, or when you want it always in context</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--teal-dark);">Option B</div>
+        <h3>Upload as a file</h3>
+        <ul class="clean teal-dots">
+          <li>Save as a <code>.md</code> file, upload via Add Content / Knowledge</li>
+          <li>Best for longer documents — the field can feel cramped</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 2</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 16 — Section: First real task -->
+  <!-- ============================================================ -->
+  <div class="slide amber" data-slide="16">
+    <div class="section-wrap">
+      <div class="part-label">Part 3</div>
+      <h1>Your First Real Task</h1>
+      <p>The payoff moment — a real morning briefing</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 3</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 17 — Exercise 3: Morning briefing -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="17">
+    <div class="slide-header">
+      <div class="kicker">Exercise 3 · 15 min</div>
+      <h1 class="slide-title">Morning briefing</h1>
+    </div>
+    <div class="slide-body">
+      <div class="prompt-block">"Give me a morning briefing: what's on my calendar today, and what in my inbox needs my attention. Sort by urgency using the categories in my instructions."</div>
+      <div class="grid-2" style="margin-top:22px;">
+        <div>
+          <div class="card-label">What Should Happen</div>
+          <p style="font-size:15px; color:var(--body-text); line-height:1.5;">It reads your real, connected Gmail and Calendar and returns a categorized summary. Approve any connector permission prompt if it appears.</p>
+        </div>
+        <div>
+          <div class="card-label" style="color:var(--warn);">If Categorization Looks Wrong</div>
+          <p style="font-size:15px; color:var(--body-text); line-height:1.5;">Expected on the first try. Tell it directly why, and say "remember this" if you want the correction kept — more on this in Part 4.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 3</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 18 — Section: Memory -->
+  <!-- ============================================================ -->
+  <div class="slide teal" data-slide="18">
+    <div class="section-wrap">
+      <div class="part-label" style="color:var(--navy);">Part 4</div>
+      <h1>Teach It With Memory</h1>
+      <p>The difference between a demo and something that gets better</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 4</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 19 — Exercise 4: Memory -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="19">
+    <div class="slide-header">
+      <div class="kicker">Exercise 4 · 10 min</div>
+      <h1 class="slide-title">Save it, then prove it stuck</h1>
+    </div>
+    <div class="slide-body grid-2">
+      <div class="card">
+        <span class="pill teal">Step 1</span>
+        <h3 style="margin-top:14px;">Explicit save</h3>
+        <p>Say: "Remember that I never want meeting invites before 9am."</p>
+        <p style="margin-top:8px;">Open a <strong>new chat</strong> in the same Project. Ask what it remembers. Confirm it comes back without repeating it.</p>
+      </div>
+      <div class="card">
+        <span class="pill">Step 2</span>
+        <h3 style="margin-top:14px;">Correction as memory</h3>
+        <p>Go back to something Exercise 3 got wrong. Instead of editing custom instructions, just say "remember that—" and explain the correction like you would to a person.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 4</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 20 — Memory caveat -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="20">
+    <div class="slide-header">
+      <div class="kicker">One Thing To Watch</div>
+      <h1 class="slide-title">Memory can be wrong, or go stale</h1>
+      <p class="slide-subtitle">It might "remember" that a preference always applies when it was really a one-time thing.</p>
+    </div>
+    <div class="slide-body">
+      <div class="card dark-card" style="border-left:4px solid var(--amber);">
+        <p style="font-size:18px; font-style:italic; color:var(--amber); line-height:1.6;">"That's no longer the case, forget it."&nbsp; / &nbsp;"Update that — it's actually X now."</p>
+        <p style="margin-top:14px; font-size:15px;">If it recalls something that's no longer true, just say so — same as correcting a person.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 4</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 21 — Section: Showcase -->
+  <!-- ============================================================ -->
+  <div class="slide amber" data-slide="21">
+    <div class="section-wrap">
+      <div class="part-label">Part 5</div>
+      <h1>Showcase + What's Next</h1>
+      <p>What surprised you? And where this goes from here</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 5</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 22 — Worked example -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="22">
+    <div class="slide-header">
+      <div class="kicker">Worked Example (Fictional)</div>
+      <h1 class="slide-title">Jordan Lee, VP of Operations — Acme Corp</h1>
+    </div>
+    <div class="slide-body">
+      <div class="terminal"><span class="tprompt">Prompt: "morning briefing"</span>
+
+Top 3 actions today
+1. Reply to Marcus Webb (URGENT) — shipment delay question. Draft ready for review.
+2. Priya's 2pm sync — no agenda attached. Draft one from this week's ops metrics?
+3. Deja's budget variance email (NEEDS RESPONSE) — sign-off requested by Friday.
+
+Calendar today: 3 meetings, 1 gap (11:30–1pm) big enough for focus time.
+FYI: 4 items, mostly team updates — skipped detail to save space.</div>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 5</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 23 — Go further -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="23">
+    <div class="slide-header">
+      <div class="kicker">Go Further</div>
+      <h1 class="slide-title">Advanced moves once the basics feel natural</h1>
+    </div>
+    <div class="slide-body">
+      <ul class="clean" style="font-size:17px;">
+        <li><strong>Draft replies in your voice.</strong> Not just summarizing — actually writing, in your tone, ready for your review.</li>
+        <li><strong>Track commitments with memory.</strong> "Remember I owe Deja the report by Friday" — no separate tracking doc needed.</li>
+        <li><strong>Meeting prep.</strong> Pull context on attendees from recent email and calendar history before a call.</li>
+        <li><strong>Connect Slack.</strong> Read and draft there too, using the same identity and voice.</li>
+      </ul>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Part 5</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 24 — Close -->
+  <!-- ============================================================ -->
+  <div class="slide dark" data-slide="24">
+    <div class="accent-bar"></div>
+    <div class="title-wrap">
+      <div class="eyebrow">Everything From Today Lives Here</div>
+      <h1 style="font-size:44px;">github.com/siddsdixit/<br>personal-cos-teach</h1>
+      <p>Public repo. MIT licensed. No proprietary or company information — every example is fictional. Fork it, use it on your own team, keep building after today.</p>
+      <p style="margin-top:20px; color:var(--teal); font-weight:700;">Everything you filled in today stays in YOUR claude.ai account.<br>Nobody collects or sees your instructions or your memory.</p>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Close</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 25 — Anticipated Q&A -->
+  <!-- ============================================================ -->
+  <div class="slide" data-slide="25">
+    <div class="slide-header">
+      <div class="kicker">Anticipated Questions</div>
+      <h1 class="slide-title">Have these answers ready</h1>
+    </div>
+    <div class="slide-body">
+      <ul class="clean">
+        <li><strong>Does this see my email forever / train on it?</strong> No — Connectors give live read access during use. Confirm your org's specific data-retention answer with IT before presenting.</li>
+        <li><strong>Can it send things without me approving?</strong> No — this pattern always drafts, never sends. Worth repeating twice during the session.</li>
+        <li><strong>Can other people see what it remembers about me?</strong> No — memory is scoped to your own account/Project, same as custom instructions.</li>
+        <li><strong>What if it remembers something wrong?</strong> Tell it directly — "forget that" or "that's changed, update it" — same as correcting a person.</li>
+      </ul>
+    </div>
+    <div class="slide-footer"><span>Build Your Own Personal Chief of Staff</span><span>Close</span></div>
+  </div>
+
+</div>
+
+<div id="hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp;·&nbsp; <kbd>N</kbd> speaker notes</div>
+
+<div id="nav">
+  <button class="nav-btn" id="prev-btn" aria-label="Previous"><i data-lucide="chevron-left"></i></button>
+  <div id="dots"></div>
+  <button class="nav-btn" id="next-btn" aria-label="Next"><i data-lucide="chevron-right"></i></button>
+</div>
+
+<div id="counter">1 / 26</div>
+
+<div id="notes-panel">
+  <h4>Speaker Notes</h4>
+  <div id="notes-body"></div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let isAnimating = false;
+
+  const speakerNotes = {
+    0: `<p>Cold open. Ask the room: "How many of you start the day by opening four tabs — email, calendar, Slack, a to-do list — just to figure out what matters today?" Most hands go up. That's the triage tax this session removes.</p>
+        <p>Everything we build today is generic — no company data, yours or anyone else's, appears on screen.</p>`,
+    1: `<p>Set expectations: this is hands-on the whole way through, not a lecture. By the end everyone will have a working Project pointed at their own real inbox and calendar, plus one thing saved to memory.</p>`,
+    2: `<p>Open with the problem, not the tool. This isn't one hard task — it's four easy tasks repeated daily, and the repetition is what drains you. A personal CoS removes the assembly work, not your judgment.</p>`,
+    3: `<p>Define it simply: a personal Chief of Staff is a Claude Project you set up once with these four things. Keep the memory explanation short here — "you correct it once, it remembers" — go deeper on memory in Part 4.</p>`,
+    4: `<p>Key framing line: "You're not writing code. You're writing down how you already think, once, so the model can act with your judgment instead of generic judgment."</p>
+        <p>Good moment for a short, narrated live demo of your own real CoS — under 90 seconds, don't read inbox contents aloud, just narrate the shape of the output.</p>`,
+    5: `<p>This distinction matters because attendees will otherwise try to cram everything into custom instructions. Memory is what makes commitment tracking possible without a separate tracking document.</p>`,
+    6: `<p>Say this early and repeat the "drafts never sends" rule at least twice during the session — it's the single most important safety rule in the whole pattern and the thing people ask about most.</p>`,
+    7: `<p>5 minutes. Walk the room through the setup checklist live, screen-sharing a throwaway/demo account. Confirm out loud that most of the room has a Project created and Gmail + Calendar showing "Connected" before proceeding — this segment is the most likely to run long, so budget slack elsewhere.</p>`,
+    8: `<p>This mirrors 02-SETUP-CHECKLIST.md, which should have been sent 2-3 days before the session. If people are still stuck here, keep moving and circulate to help individuals rather than holding the whole room.</p>`,
+    9: `<p>17 minutes total for Part 2. Two ways to do this: fill in the templates by hand, or let Claude interview you (see the Discovery Prompts slide). Either path ends at the same place.</p>`,
+    10: `<p>Template: templates/custom-instructions-template.md. Say explicitly: "Don't try to map your whole org chart. Pick the 5 people whose messages you'd drop everything for." If the room prefers being interviewed instead of filling blanks, point to 04-DISCOVERY-PROMPTS.md Prompt 2.</p>`,
+    11: `<p>Template: templates/voice-template.md. The highest-leverage 2 minutes in this whole exercise is step 3 — a single real writing sample does more than any amount of describing tone in the abstract.</p>`,
+    12: `<p>Key slide — this is the one attendees usually get confused on. Say explicitly: "There is exactly one file that always goes in Custom Instructions. Everything else is optional and can be attached separately or merged in." Point at custom-instructions-template.md by name.</p>`,
+    13: `<p>Read this prompt out loud once, or share your screen with 04-DISCOVERY-PROMPTS.md open so people can copy the exact text — don't make them retype it from the slide. Remind them to paste in their own real writing samples FIRST, before this prompt text.</p>`,
+    14: `<p>Same as the previous slide — screen-share the source file so people copy exact text. This one needs no prep, it's a pure interview, so it's the easier of the two to run live if time is short.</p>`,
+    15: `<p>Both options are equally valid — this is a personal preference, not a best-practice question. Some people mix: identity pasted directly, voice guide uploaded as a file.</p>`,
+    16: `<p>12 minutes. This is the point in the session with the least control — real data means real surprises. Prime the room: "It's going to show YOU your own inbox summary — nobody else can see it." Circulate rather than talk during this segment.</p>`,
+    17: `<p>Optional stretch if time allows: "prep me for my next meeting today" — see what context it pulls together from calendar and recent email with that attendee.</p>`,
+    18: `<p>8 minutes. This is the segment most likely to make someone say "oh, THAT'S useful" out loud. If short on time, compress to a single live demo on your screen using a throwaway fact rather than skipping it.</p>`,
+    19: `<p>Why this matters: this is what makes it feel like it's actually learning you, instead of you maintaining a settings file forever. It's also how you'd track commitments day to day — "remember I told the team I'd send this by Friday" — without a separate tracking document.</p>`,
+    20: `<p>Correct memory the same way you'd correct a person. Worth demoing this once live so people see it's not a one-way ratchet — memory is editable, not permanent.</p>`,
+    21: `<p>6 minutes. Ask for 2-3 volunteers to share verbally (not screen-share, to protect their own inbox privacy) what surprised them about the output.</p>`,
+    22: `<p>This example is fully fictional — from examples/worked-example-anonymized.md. Point out WHY it's useful: it ranked by what Jordan said mattered (not generic importance), offered to draft rather than just flag, and didn't dump FYI items in full because "keep it scannable" was in the instructions.</p>`,
+    23: `<p>Explicitly say: "These templates are v1. The real system gets better as you correct it — some corrections belong in your instructions, some just need you to say remember this." See templates/config-template.md for calendar and approval preferences.</p>`,
+    24: `<p>Say explicitly: open this on your own laptop or phone later, the templates and exercises are all there — you don't need me in the room to keep going. This repo itself is safe to share outside the company too.</p>`,
+    25: `<p>Full list including license/plan-tier questions is in 00-FACILITATOR-GUIDE.md. Confirm with IT/security what you're allowed to say about data handling before presenting.</p>`
+  };
+
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function updateNotes() {
+    const note = speakerNotes[current];
+    document.getElementById('notes-body').innerHTML = note || '<p style="opacity:0.5;">No speaker notes for this slide.</p>';
+  }
+
+  function updateUI() {
+    const pct = ((current + 1) / total) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === total - 1;
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    updateNotes();
+  }
+
+  function goTo(index) {
+    if (isAnimating || index < 0 || index >= total || index === current) return;
+    isAnimating = true;
+    const dir = index > current ? 1 : -1;
+    const prevSlide = slides[current];
+    const nextSlide = slides[index];
+    current = index;
+
+    prevSlide.classList.remove('active');
+    prevSlide.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+
+    nextSlide.style.transform = dir > 0 ? 'translateX(60px) scale(0.98)' : 'translateX(-60px) scale(0.98)';
+    nextSlide.style.opacity = '0';
+    nextSlide.classList.add('active');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        nextSlide.style.transform = '';
+        nextSlide.style.opacity = '';
+      });
+    });
+
+    setTimeout(() => {
+      prevSlide.classList.remove('exit-left', 'exit-right');
+      prevSlide.style.transform = '';
+      prevSlide.style.opacity = '';
+      isAnimating = false;
+    }, 420);
+
+    updateUI();
+  }
+
+  let notesOpen = false;
+  function toggleNotes() {
+    notesOpen = !notesOpen;
+    document.getElementById('notes-panel').classList.toggle('open', notesOpen);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    else if (e.key === 'n' || e.key === 'N') { toggleNotes(); }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) dx > 0 ? goTo(current + 1) : goTo(current - 1);
+  });
+
+  document.getElementById('prev-btn').onclick = () => goTo(current - 1);
+  document.getElementById('next-btn').onclick = () => goTo(current + 1);
+
+  updateUI();
+</script>
+</body>
+</html>
