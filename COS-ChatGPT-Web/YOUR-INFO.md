@@ -9,16 +9,16 @@ the same way you attach the others (see the main README for how).
 
 ---
 
-**1. Your name:**
+**1. Your name:** Erin Denham
 
 
-**2. Your role / job title:**
+**2. Your role / job title:** President 
 
 
-**3. Your company name:**
+**3. Your company name:** JT Mega
 
 
-**4. Your timezone** (example: Pacific Time, Eastern Time, London time):
+**4. Your timezone** (example: Pacific Time, Eastern Time, London time): Central
 
 
 **5. Your manager's name and title** (leave blank if not applicable):
@@ -28,14 +28,14 @@ the same way you attach the others (see the main README for how).
 drop everything for. For each, write their name and how they relate to
 you (example: "Jane Smith - my manager", "Alex Kim - my co-founder"):
 
--
--
--
--
--
+- Muriel Bartelme Kreske - My Chief Creative Officer, Partner, Agency visionary
+- Lanie Melby - Account Director on largest account
+- Joel Wilson - Account Director on largeest account
+- Sandri Dekker - Digital Strategist, AI specialist
+- 
 
 **7. Your company's email domain** (the part after the @ in your work
-email, example: acmecorp.com):
+email, example: acmecorp.com): jtmega.com
 
 
 **8. If you have a parent company, board, or investors with their own
@@ -44,13 +44,13 @@ email domain, list that domain too** (leave blank if not applicable):
 
 **9. What "urgent" actually means for your job** — be specific. Example:
 "anything from my manager about a client issue" or "anything with a
-same-day deadline." One or two sentences is enough:
+same-day deadline." One or two sentences is enough: Asks for review or approval of something, indicates an issue with a client, indicates an issue with an employee, anything with urgent deadline. 
 
 
 **10. The Slack channels you check most often** (just the names, example:
 "#leadership", "#engineering". Leave blank if you don't use Slack):
 
--
+- #general
 -
 -
 
