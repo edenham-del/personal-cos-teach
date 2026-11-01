@@ -1,0 +1,18 @@
+Read config.yaml and voice.md from this folder.
+
+the request I gave you should describe what to write and optionally who to send it to.
+
+If replying to an existing thread:
+1. Search Gmail for the thread.
+2. Read the full thread.
+3. Determine tone from config (executive/team/external).
+4. Draft a reply on that thread.
+
+If composing new:
+1. Draft a new email.
+2. Follow voice.md structure: opening (1-2 lines), body (bullets if
+   helpful), close (clear ask + owner + timeline).
+
+Show the draft summary. Never send directly.
+
+the request I gave you

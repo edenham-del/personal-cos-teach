@@ -1,0 +1,12 @@
+the request I gave you should include a channel name or thread link.
+
+Steps:
+1. If channel name given, look up the channel ID.
+2. If thread link given, extract the channel ID and message timestamp.
+3. Read the thread.
+4. Summarize: who said what, what was decided, what's still open, any
+   action items.
+
+Keep summary under 10 lines.
+
+the request I gave you
