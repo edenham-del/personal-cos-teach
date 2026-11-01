@@ -14,7 +14,7 @@ A person has pasted this repo's link into you (ChatGPT, Claude, Gemini, Copilot 
 
 1. **Which assistant will the Chief of Staff live in?** Claude, ChatGPT, Gemini, or something else (see "Other assistants" below).
 2. **Browser or terminal?** If they say "I don't know", "never used a terminal", or they are not a developer, choose **browser**. Terminal versions are for people who already run Claude Code, Codex CLI or Gemini CLI.
-3. **Do you want to use real data or the workshop's fictional example?** If unsure, use the fictional example (a manufacturer foodservice sales director) so nothing sensitive is pasted anywhere.
+3. **Do you want to use real data or the workshop's fictional example?** If unsure, use the fictional example so nothing sensitive is pasted anywhere. Its files: [`scenarios/sales-leader.md`](https://raw.githubusercontent.com/siddsdixit/personal-cos-teach/main/COS-Workshop/scenarios/sales-leader.md) (a week of fictional emails, calendar and commitments) and [`scenarios/sample-YOUR-INFO.md`](https://raw.githubusercontent.com/siddsdixit/personal-cos-teach/main/COS-Workshop/scenarios/sample-YOUR-INFO.md) (a filled-in `YOUR-INFO.md`). The person uploads the scenario file alongside the others, then says "morning briefing".
 
 ### Step 1: Pick the folder
 
@@ -24,7 +24,7 @@ A person has pasted this repo's link into you (ChatGPT, Claude, Gemini, Copilot 
 | ChatGPT | `COS-ChatGPT-Web/` | `COS-ChatGPT-Codex/` |
 | Gemini | `COS-Gemini-Web/` | `COS-Gemini-CLI/` |
 
-Fetch that folder's `README.md` and the files listed below. Use the file links in this page; fetch the raw text, do not guess its contents. If you cannot open links, ask the person to open the folder on GitHub and paste the file contents to you.
+Fetch that folder's `README.md` and the files listed below. Use the file links in this page; fetch the raw text, do not guess its contents. If you cannot open links (many chat assistants cannot browse GitHub), say so and ask the person to paste this page's text, or open each file on GitHub and paste its contents to you.
 
 ### Step 2: Guide them, one step at a time
 

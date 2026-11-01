@@ -20,6 +20,8 @@ The same Chief of Staff pattern as [`../COS-Claude-Web/`](../COS-Claude-Web/), s
 
 **No Projects on your plan?** Use a Custom GPT instead: **Explore GPTs → Create → Configure**. Paste the instructions into **Instructions** and upload the same files under **Knowledge**. Custom GPTs cannot use Memory, so keep open loops in `knowledge-logbook.md` and re-upload it when it changes.
 
+**Want to practice with fictional data?** Upload [`../COS-Workshop/scenarios/sales-leader.md`](../COS-Workshop/scenarios/sales-leader.md) as well (and use [`sample-YOUR-INFO.md`](../COS-Workshop/scenarios/sample-YOUR-INFO.md) instead of your own `YOUR-INFO.md`). Then say "morning briefing".
+
 ## What's in here
 
 | File | Do you edit it? | What it does |

@@ -20,6 +20,8 @@ The same Chief of Staff pattern as [`../COS-Claude-Web/`](../COS-Claude-Web/), s
 
 **Gems cannot remember between chats.** Keep open loops in `knowledge-logbook.md`: ask the Gem for an updated copy at the end of a chat, save it, and replace the file under Knowledge. Gem knowledge files are read-only to the Gem.
 
+**Want to practice with fictional data?** Upload [`../COS-Workshop/scenarios/sales-leader.md`](../COS-Workshop/scenarios/sales-leader.md) as well (and use [`sample-YOUR-INFO.md`](../COS-Workshop/scenarios/sample-YOUR-INFO.md) instead of your own `YOUR-INFO.md`). Then say "morning briefing".
+
 ## What's in here
 
 | File | Do you edit it? | What it does |

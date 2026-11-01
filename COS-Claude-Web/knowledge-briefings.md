@@ -10,6 +10,8 @@ loaded as Project context instead of an account-wide auto-invoked skill.
 Use this if Skills isn't available on your plan/workspace, or if you'd
 rather not deal with code execution + zip uploads.
 
+**No connected tools?** Run every briefing from the files and text I attached (for example a scenario file). Say so in one line, then deliver. Never invent items.
+
 | Say this | Runs |
 |---|---|
 | "morning briefing" / "morning brief" | Morning Briefing |

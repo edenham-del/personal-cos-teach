@@ -4,10 +4,8 @@ Upload this file as Gem knowledge (see the README for the exact clicks). It cont
 daily cadence. Say the trigger phrase for whichever one you want, and
 follow that section's instructions.
 
-This is the knowledge-file version of a reusable skill — same content, just
-loaded as Gem context instead of a built-in skill.
-Use this if Skills isn't available on your plan/workspace, or if you'd
-rather not deal with code execution + zip uploads.
+
+**No connected tools?** Run every briefing from the files and text I attached (for example a scenario file). Say so in one line, then deliver. Never invent items.
 
 | Say this | Runs |
 |---|---|

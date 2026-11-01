@@ -23,6 +23,10 @@ Whichever of these Connectors are turned on for this Project: Gmail,
 Google Calendar, Slack. If a Connector isn't connected, say so plainly
 instead of pretending to check it.
 
+## No Connected Tools? Work From Files
+
+If Gmail, Calendar or Slack are not connected, do not say you cannot do the briefing. Work only from the files and text I have attached or pasted (for example a scenario file with emails, a calendar and open commitments). Say once, in one line, that you are working from files, then deliver the briefing. Never invent emails, meetings or commitments that are not in the files.
+
 ## How To Categorize Email and Slack
 
 Sort into these buckets:

@@ -30,7 +30,7 @@ Connect tools through MCP servers in `~/.codex/config.toml` (`[mcp_servers.<name
 
 ## Commands
 
-Codex has no project-level slash commands. Say it in plain English instead: "run the cos-brief recipe on the Northstar pricing thread". Codex reads `commands/cos-brief.md` and follows it. (Optional: copy a recipe to `~/.codex/prompts/` to get a `/prompts:cos-brief` command on your machine.)
+Codex has no project-level slash commands. Say it in plain English instead: "run the cos-brief recipe on the Northstar pricing thread". Codex reads `commands/cos-brief.md` and follows it.
 
 ## Recipes in `commands/`
 
@@ -38,7 +38,7 @@ Codex has no project-level slash commands. Say it in plain English instead: "run
 
 ## Scheduling
 
-Neither tool has a built-in scheduler. To run a routine at 7 AM, use cron or launchd to run `codex -p "morning briefing"` from this folder. Keep it draft-only.
+Neither tool has a built-in scheduler. To run a routine at 7 AM, use cron or launchd to run `codex exec "morning briefing"` from this folder. Keep it draft-only.
 
 ## Safety
 

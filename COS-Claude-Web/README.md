@@ -34,6 +34,8 @@ or company-specific information is in this folder.
 That's the whole setup. If something doesn't work, the most common cause
 is step 3 or step 6 — double check both are actually turned on.
 
+**Want to practice with fictional data?** Upload [`../COS-Workshop/scenarios/sales-leader.md`](../COS-Workshop/scenarios/sales-leader.md) as well (and use [`sample-YOUR-INFO.md`](../COS-Workshop/scenarios/sample-YOUR-INFO.md) instead of your own `YOUR-INFO.md`). Then say "morning briefing".
+
 ## What's in here
 
 | File | Do you edit it? | What it does |
