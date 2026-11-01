@@ -2,7 +2,7 @@
 
 Welcome to Sid Dixit's live build. Keep this page open on your phone and use your laptop to build in **Claude.ai, ChatGPT, or Gemini**. No terminal or GitHub account is needed.
 
-**Take-home guide:** [Open the step-by-step PDF](./participant-build-guide.pdf) · [Download the editable PowerPoint](./participant-build-guide.pptx)
+**Take-home deck:** [Open the full workshop PDF](./IFMA-Personal-Chief-of-Staff-Live-Build.pdf) · [Download the editable PowerPoint](./IFMA-Personal-Chief-of-Staff-Live-Build.pptx)
 
 The goal today is one safe assistant that knows your priorities, writes in your voice, tracks open loops, and produces a useful briefing. It **drafts, never sends**. We will pause three times so you can follow along. If you prefer to watch, you can build it afterward with the same guide.
 
