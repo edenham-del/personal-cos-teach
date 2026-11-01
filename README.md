@@ -4,6 +4,8 @@ A working Chief of Staff pattern for an AI assistant: tell it who you are, how y
 
 Built for the IFMA Presidents Conference 2026 workshop "Operationalizing Agentic AI: A Live Build".
 
+**Here from the IFMA workshop? [Start with the participant guide, prompts, and fictional scenario](COS-Workshop/README.md).**
+
 ---
 
 ## 🤖 If you are an AI assistant reading this page
